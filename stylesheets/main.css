@@ -1,0 +1,250 @@
+body {
+    background-color: #b2d1ff;
+}
+
+div {
+    display: inline-block;
+}
+
+#tower {
+    background-color: #3d3d5c;
+    width: 46%;
+    height: 65%;
+    position: absolute;
+    left: 27%;
+    bottom: 25%;
+    cursor: url(../images/crosshair.gif) 32 32, crosshair;
+}
+
+#tower table {
+    table-layout: fixed;
+    height: 100%;
+    width: 100%;
+    #padding-right: 1.5%;
+    border-collapse: separate;
+    border-spacing: .7em;
+}
+
+#tower table th {
+    width: 0;
+}
+
+#tower table td {
+   
+    position: relative;
+    background-color: #3399ff;
+    box-shadow: inset 1px 1px 2px 1px black, 1px 1px 4px 1px gray;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.ninja, .woman, .man, .super-ninja {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    left: 0;
+    top: 100%;
+    #z-index: 3;
+}
+
+.super-ninja {
+    background-image: url('../images/superNinja.png');
+}
+
+.ninja {
+    background-image: url('../images/Ninja.png');
+}
+
+.woman {
+    background-image: url('../images/woman.png');
+}
+
+.man {
+    background-image: url('../images/man.png');
+}
+
+#sidewalk {
+    background-color: #7a7a52;
+    position: absolute;
+    bottom: 18%;
+    left: 0;
+    height: 7%;
+    width: 100%;
+    box-shadow: 0px 6px 8px black;
+    z-index: 2;
+}
+
+#road {
+    background-color: #1f1f14;
+    width: 100%;
+    height: 18%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.road-stripe {
+    background-color: yellow;
+    height: 10%;
+    width: 15%;
+    position: relative;
+    top: 45%;
+    margin-left: 4.166%;
+    
+}
+
+#score-board {
+    position: absolute;
+    right: 6%;
+    top: 2%;
+    font-size: 3em;
+    font-weight: 800;
+    font-family: sans-serif;
+    text-align: center;
+    background-color: #b2d1ff;
+    color: transparent;
+    text-shadow: 3px 3px 2px rgba(255, 255, 255, 0.5), 0px 0px 0px rgba(12, 20, 63, 0.25);
+    -webkit-background-clip: text;
+       -moz-background-clip: text;
+            background-clip: text;
+}
+
+#underline {
+    text-decoration: underline;
+}
+
+.cloud1 {
+    position: absolute;
+    width: 18%;
+    height: 20%;
+    top: 20px;
+    left: 20px;
+}
+
+.cloud-part {
+    background-color: white;
+    border-radius: 50%;
+    height: 30%;
+    position: absolute;
+    width: 25%;
+    box-shadow: -2px 0px 3px gray;
+}
+
+#c1p1 {
+    left: 24%;
+    top: 12%;
+    z-index: 1;
+}
+
+#c1p2 {
+    left: 33%;
+    top: 2%;
+}
+
+#c1p3 {
+    left: 5%;
+    top: 14%;
+    z-index: 2;
+}
+
+#c1p4 {
+    left: 7%;
+    top: -6%;
+    z-index: 1;
+}
+
+#c1p5 {
+    left: 22%;
+    top: -12%;
+}
+
+#c2p1 {
+    height: 40%;
+    width: 100%;
+    right: 10%;
+    top: 50%;
+    z-index: -2;
+}
+
+#c2p2 {
+    width: 88%;
+    height: 50%;
+    top: 52%;
+    left: 7%;
+    z-index: -1;
+}
+
+#c2p3 {
+    width: 70%;
+    height: 40%;
+    top: 33%;
+    left: 41%;
+    z-index: -2;
+}
+
+#c2p4 {
+    width: 88%;
+    height: 40%;
+    top: 30%;
+    left: -32%;
+    z-index: -2;
+}
+
+#c2p5 {
+    width: 70%;
+    height: 40%;
+    top: 11%;
+    left: 46%;
+    z-index: -3;
+}
+
+#c2p6 {
+    width: 98%;
+    height: 40%;
+    top: 7%;
+    left: -26%;
+    z-index: -3; 
+}
+
+.tree {
+    width: 10%;
+    height: 30%;
+    position: absolute;
+    bottom: 20%;
+    left: 15%;
+    z-index: 3;
+}
+
+#top {
+    background-color: green;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 42%;
+    left: 22%;
+    box-shadow: 0px 2px 5px black;
+    height: 50%;
+    width: 56%;
+    z-index: 4;
+}
+
+#trunk {
+    background-color: brown;
+    width: 12%;
+    height: 45%;
+    position: absolute;
+    bottom: 0;
+    left: 44%;
+    box-shadow: 0px 0px 5px black;
+}
+
+#timer {
+    position: absolute;
+    color: darkgreen;
+    font-size: 24px;
+    left: 24%;
+    bottom: 40%;
+}
