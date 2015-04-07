@@ -1,20 +1,20 @@
 var showTO, hideTO, shuffle;
-var totalScore = 100;
+var totalScore = 0;
+var gameModes = ['Timed', 'Ammo', 'Survival'];
+var gameStatus = 'stopped';
 
 $(document).ready(function(){
     populate(true);
     clearTOs();
-    //var windows = $('#tower table td'); 
-    //var inWindow = $('<div>');
+    getReady(true);
     
-    //inWindow.addClass('ninja');
-    
-    //inWindow.appendTo(windows);
+    addTrees(2, 10, 70, 20, '#lvl1');
+    addTrees(4, 15, 20, 20, '#mm-background'); 
+    addTrees(5, 5, 20, 10, '#mm-background');
     
     $('table').on('click', 'td div', function(){
-        var badGuy = $(this)
-        console.log('got me!', badGuy);
-        badGuy.slideUp(200);
+        var badGuy = $(this);
+        badGuy.stop().slideUp(150);
         updateScore(badGuy);
     });
     
@@ -29,7 +29,47 @@ $(document).ready(function(){
     $('body').on('click', '#trunk', function(){
         $('td div').animate({top: '12%'}, 300);
     });
+    
+    $('#main-menu').on('click', '#new-game', function(){        
+        window.location = '?page=lvl1.php';
+    });
+    
+    $('#main-menu').on('click', '#game-mode', function(){
+        var modeBtn = $('#gMode');
+        var mode = modeBtn.text();
+        var index = 0;
+        
+        switch(mode){
+                case 'Timed':
+                    index = 1;
+                    break;
+                case 'Ammo':
+                    index = 2;
+                    break;
+                case 'Survival':
+                    index = 0;
+                    break;
+        }
+        modeBtn.text(gameModes[index]);
+    });
 });
+
+function startGame(){
+    gameStatus = 'running';
+    populate(true);
+    $('.gTimer').attr('id', 'timer');
+    timer('start', 15);
+    setTimeout(gameOver, 15000);
+}
+
+function gameOver(){
+    gameStatus = 'stopped';
+    clearTOs();
+    var temp = $('<div>Game Over</div>');
+    
+    temp.css({zIndex: 5, fontSize: '4em'});
+    temp.appendTo('body');
+}
 
 function populate(ready){
     var windows = $('#tower table td');
@@ -73,6 +113,7 @@ function randomPopUp(){
     var ranIndex = Math.floor(Math.random() * (peopleCount-1));
     var person = $(people[ranIndex]);
     
+    person.removeClass('fall');
     person.animate({top: '12%'}, 300);
     
     if(person.hasClass('super-ninja')){
@@ -86,8 +127,6 @@ function randomPopUp(){
     
     var showTime = Math.floor((Math.random() * 1000) + 500);
     showTO = setTimeout(function(){randomPopUp();}, showTime);
-    //return people;
-    //console.log("hide time: ", hideTime, "show time: ", showTime);
 }
 
 function clearTOs(extra){
@@ -100,13 +139,13 @@ function clearTOs(extra){
 
 function updateScore(person){
     if(person.hasClass('ninja')){
-        console.log("You clicked a ninja");
+        //console.log("You clicked a ninja");
         totalScore += 2;
     }else if(person.hasClass('super-ninja')){
-        console.log("You clicked a super ninja");
+        //console.log("You clicked a super ninja");
         totalScore += 4;
     }else{
-        console.log("You clicked a person");
+        //console.log("You clicked a person");
         if(totalScore > 2){
             totalScore -= 2;
         }
@@ -114,30 +153,33 @@ function updateScore(person){
     $('#total-score').text(totalScore);
 }
 
-function addTrees(amount, loc, seperation){
+function addTrees(amount, loc, seperation, verticle, append){
     if(amount < 1){
         return;
     }
-    var percent = loc + '%';
+    var locPercent = loc + '%';
     var id = 'tree' + loc;
     
-    //console.log('percent: ', percent, 'id: ', id);
-    buildTree(id).css("left", percent).appendTo('body');
+    if(verticle === undefined){
+        verticle = 20;
+    }
+    
+    var vertPercent = verticle + '%';
+    
+    buildTree(id).css({left: locPercent, bottom: vertPercent}).appendTo(append);
     
     
     
-    addTrees(amount-1, loc+seperation, seperation);
+    addTrees(amount-1, loc+seperation, seperation, verticle, append);
 }
 
 function buildTree(id){
-    var mainCSS = {bottom: '20%', height: '30%', left: '0%', position: 'absolute', width: '10%', zIndex: '3'};
+    var mainCSS = {height: '30%', left: '0%', position: 'absolute', width: '10%', zIndex: '3'};
     
     var topHeight = Math.floor((Math.random() * 20) + 40) + "%";
     var topWidth = Math.floor((Math.random() * 20) + 40);
     var topLeft = ((100 - topWidth)/2) + "%";
     topWidth += "%";
-    
-    console.log("height:", topHeight, "width:", topWidth, "left:", topLeft);
     
     var topCSS = {backgroundColor: 'green', 
                   borderRadius: '50%', 
@@ -157,7 +199,7 @@ function buildTree(id){
                     left: '44%',
                     boxShadow: '0px 0px 5px black'}
     
-    var container = $("<div id=" + id + "></div>").css(mainCSS);
+    var container = $("<div class='tree' id=" + id + "></div>").css(mainCSS);
     var top = $('<div>').css(topCSS);
     var trunk = $('<div>').css(trunkCSS);
     
@@ -190,3 +232,18 @@ function timer(status, howLong, timeOut, start){
     
     $('#timer').text(howLong-elapsed);
 } 
+
+function getReady(init){
+    if(init){
+        timer('start', 5);
+    }
+    var counter = $('.get-ready');
+    counter.addClass('number-animate');
+    
+    if(counter.text() > 0){
+        setTimeout(function(){getReady(false);}, 1000);
+    }else{
+        counter.text('GO!');
+        setTimeout(function(){$('#gr-container').remove(); startGame();}, 1000);
+    }
+}

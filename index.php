@@ -1,3 +1,9 @@
+<?php 
+session_start();
+if(!isset($_SESSION['allowed'])){
+    $_SESSION['allowed'] = ['mainMenu.php', 'lvl1.php'];
+}
+?>
 <!DOCUMENT html>
 <html>
     <head>
@@ -8,84 +14,25 @@
         <link rel="stylesheet" href="stylesheets/main.css">
     </head>
     <body>
-       
-        <div id="score-board"><span id='underline'>Score</span><br><span id="total-score">0</span>
-            <div class='cloud-part' id="c2p1"></div>
-            <div class='cloud-part' id="c2p2"></div>
-            <div class='cloud-part' id="c2p3"></div>
-            <div class='cloud-part' id="c2p4"></div>
-            <div class='cloud-part' id="c2p5"></div>
-            <div class='cloud-part' id="c2p6"></div>
-        </div>
-        <div class='cloud1'>
-            <div class='cloud-part' id="c1p1"></div>
-            <div class='cloud-part' id="c1p2"></div>
-            <div class='cloud-part' id="c1p3"></div>
-            <div class='cloud-part' id="c1p4"></div>
-            <div class='cloud-part' id="c1p5"></div>
-        </div>
         
-        <div id='timer'>24</div>
+        <section id="main-area">
+           <?php 
+                $allowed = ['mainMenu.php', 'lvl1.php']; //$_SESSION['allowed'];
+                if(!isset($_GET['page'])){$_GET['page'] = "mainMenu.php";}
+                $i = count($allowed);
+
+                while(!isset($page)){
+                    if($allowed[$i-1] === $_GET['page']){
+                        $page = $_GET['page'];
+                    }elseif($i <= 1){
+                        $page = "404.php";
+                    }
+                    $i--;
+                }
+                
+                require_once($page); 
+           ?>
+        </section>
         
-        <div class="tree">
-            <div id="top"></div>
-            <div id="trunk"></div>
-        </div>
-        
-        <div id="tower">
-            <table>
-               <tbody>
-                <tr>
-                    <th></th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th></th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th></th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th></th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <th></th>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <div id="sidewalk"></div>
-        <div id="road">
-            <div class='road-stripe' id="l1"></div>
-            <div class='road-stripe' id="l2"></div>
-            <div class='road-stripe' id="l3"></div>
-            <div class='road-stripe' id="l4"></div>
-            <div class='road-stripe' id="l5"></div>
-        </div>
     </body>
 </html>

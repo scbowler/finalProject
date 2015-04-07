@@ -6,6 +6,71 @@ div {
     display: inline-block;
 }
 
+#gr-container {
+    height: 70%;
+    width: 25%;
+    text-align: center;
+    position: absolute;
+    color: white;
+    text-shadow: 4px 3px 0px black, 6px 5px 5px white;
+    top: 12%;
+    left: 37.5%;
+    font-weight: 800;
+    overflow: hidden;
+    z-index: 4;
+}
+
+#get-ready {
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    font-size: 0;
+    position: relative;
+    
+}
+
+.number-animate {
+    top: 0;
+    -webkit-animation: count-down 1s infinite;
+    z-index: 5;
+}
+
+@-webkit-keyframes count-down {
+    0% {
+        top: -100%;
+        font-size: 0em;
+    }
+    
+    40% {
+        top: 0%;
+        font-size: 10em;
+    }
+    
+    60% {
+        top: 0%;
+        font-size: 10em;
+    }
+    
+    100% {
+        top: 12%;
+        font-size: 0em;
+    }
+}
+
+/*
+    ==========================
+    ==        Level 1       ==
+    ==========================
+*/
+
+#lvl1 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
 #tower {
     background-color: #3d3d5c;
     width: 46%;
@@ -20,7 +85,6 @@ div {
     table-layout: fixed;
     height: 100%;
     width: 100%;
-    #padding-right: 1.5%;
     border-collapse: separate;
     border-spacing: .7em;
 }
@@ -30,12 +94,21 @@ div {
 }
 
 #tower table td {
-   
     position: relative;
     background-color: #3399ff;
     box-shadow: inset 1px 1px 2px 1px black, 1px 1px 4px 1px gray;
     border-radius: 6px;
     overflow: hidden;
+}
+
+@-webkit-keyframes fall-back {
+    from {-webkit-transform: rotateX(0deg);}
+    to {-webkit-transform: rotateX(-90deg);}
+}
+
+.fall{
+    -webkit-animation: fall-back .3s;
+    -webkit-transform-origin: bottom;
 }
 
 .ninja, .woman, .man, .super-ninja {
@@ -210,41 +283,60 @@ div {
     z-index: -3; 
 }
 
-.tree {
-    width: 10%;
-    height: 30%;
+.gtimer {
     position: absolute;
-    bottom: 20%;
-    left: 15%;
-    z-index: 3;
+    color: black;
+    font-weight: 800;
+    font-size: 3em;
+    left: 18%;
+    top: 0%;
 }
 
-#top {
-    background-color: green;
-    border-radius: 50%;
+/*
+    ==========================
+    ==       Main Menu      ==
+    ==========================
+*/
+
+#main-menu {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 20%;
     position: absolute;
-    bottom: 42%;
-    left: 22%;
-    box-shadow: 0px 2px 5px black;
-    height: 50%;
-    width: 56%;
-    z-index: 4;
+    #border: 2px solid red;
+    width: 30%;
+    font-size: 2em;
+    top: 20%;
+    left: 35%;
+    text-align: center;
+    z-index: 10;
 }
 
-#trunk {
-    background-color: brown;
-    width: 12%;
-    height: 45%;
+.btn {
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: -3px 2px 6px 0px white, -3px 3px 0px 2px black;
+    #border: 2px solid black;
+    width: 75%;
+    border-radius: 25%;
+    text-align: center;
+    margin: 6% 0;
+    padding: 2% 4%;
+    cursor: pointer;
+}
+
+.menu-text {
+    font-weight: 800;
+    color: transparent;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, .6), 0px 0px 0px rgba(0, 0, 0, 0.9);
+    -webkit-background-clip: text;
+       -moz-background-clip: text;
+            background-clip: text;
+}
+
+#grass {
     position: absolute;
+    background-color: lightgreen;
     bottom: 0;
-    left: 44%;
-    box-shadow: 0px 0px 5px black;
-}
-
-#timer {
-    position: absolute;
-    color: darkgreen;
-    font-size: 24px;
-    left: 24%;
-    bottom: 40%;
+    left: 0;
+    width: 100%;
+    height: 40%;
 }
