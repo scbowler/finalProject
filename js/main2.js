@@ -16,6 +16,9 @@ var maximum_npcs_up = 10;
 var popup_scale_min_npc_num = 5;
 var popup_chance_delta_per_npc = base_popup_chance_per_second/(maximum_npcs_up-popup_scale_min_npc_num);
 var npcContainer=null;
+var min_heartbeat = 1;
+var max_heartbeat = 5;
+var max_heartbeat_adjusted = (max_heartbeat + 1) - min_heartbeat;
 
 
 function npc(target_element, npc_index) {
@@ -25,7 +28,9 @@ function npc(target_element, npc_index) {
     this.hideTime = 1500; 
     this.showTime = 750;
     this.log=[];
-    this.show_log = true;
+    this.keep_log = false;
+    this.display_log = false;
+    this.change_after_popdown = true;
     this.superninja_hidetime = 1000;
     this.actor = null; //the image class, ie woman, ninja, man, etc
     this.element = target_element; //the element that will display this npc
@@ -42,9 +47,10 @@ function npc(target_element, npc_index) {
     this.start_game = function(){
         this.stop_heartbeat();
         var _this=this;
+        var this_heartbeat_time = (Math.floor(Math.random() * this.max_heartbeat_adjusted) + this.min_heartbeat)*1000;
         this.heartbeat = setInterval(function(){
             _this.popup_check();
-        },1000);
+        },this_heartbeat_time);
     }
     this.stop_game = function(){
         this.stop_heartbeat();
@@ -56,13 +62,15 @@ function npc(target_element, npc_index) {
         }  
     }
     this.toggle_log = function(){
-        this.show_log = !this.show_log;
+        this.display_log = !this.display_log;
     }
     this.log_action = function(message){
-        if(this.show_log){
+        if(this.display_log){
             console.log(message);
         }
-        this.log.push(message);
+        if(this.keep_log){
+            this.log.push(message);
+        }
     }
     this.show_log = function(){
         console.log('mooooo');
@@ -72,8 +80,7 @@ function npc(target_element, npc_index) {
         this.message = [];
     }
     this.popup_check = function(){
-            this.log_action(this.index+': popup checking: '+total_npcs_up+'<'+popup_scale_min_npc_num);
-if(total_npcs_up<popup_scale_min_npc_num){
+        if(total_npcs_up<popup_scale_min_npc_num){
             
             var percent_popup = (maximum_npcs_up - popup_scale_min_npc_num) * popup_chance_delta_per_npc;
             this.log_action(this.index+': percent_popup: '+percent_popup);
@@ -106,7 +113,13 @@ if(total_npcs_up<popup_scale_min_npc_num){
     this.popdown = function(){
         this.log_action(this.index+': popping down');
         total_npcs_up--;
-        this.element.animate({top: '100%'}, this.hideTime);
+        this.element.animate({top: '100%'}, this.hideTime, this.change_check);
+    }
+    this.change_check = function(){
+        if(this.change_after_pop){
+            this.select_random_actor();
+            this.set_image();
+        }
     }
     this.was_hit = function(){
         //function hitNPC()
@@ -174,12 +187,15 @@ $(document).ready(function(){
 
 function init(){
     
-    
+    var index=0;
     NPCarray = $('.npc-container');
+    NPCarray.each(function(){
+        NPC_list.push(new npc($(NPCarray[index]),index));
+        index++;
+    });
     console.log('starting test');
-    window.test = new npc($(NPCarray[0]),0);
-    window.test2 = new npc($(NPCarray[1]),1);
-    NPCcount = NPCarray.length;
+
+    NPCcount = NPC_list.length;
 }
 
 function startGame(){
@@ -190,11 +206,15 @@ function startGame(){
     finalScore = 0;
     gameStatus = 'running';
     $('#total-score').text(totalScore);
-    populate(true);
+    for(i=0; i<NPCcount; i++)
+    {
+        NPC_list[i].start_game();
+    }
+    //populate(true);
     timer('start', 15);
     
     $('body').on('click', countClicks);
-    $('table').on('click', 'td div', hitNPC);
+    //$('table').on('click', 'td div', hitNPC);
 }
 
 function countClicks(){
@@ -210,15 +230,18 @@ function hitNPC(){
 
 function gameOver(){
     $('body').off('click', countClicks);
-    $('table').off('click', 'td div', hitNPC);
+    //$('table').off('click', 'td div', hitNPC);
     
     gameStatus = 'stopped';
-    clearTOs();
+    //clearTOs();
     updateSideMenu();
-    
-    hideTO = {};
-    showTO = {};
-    TOindex = 0;
+    for(i=0; i<NPCcount; i++)
+    {
+        NPC_list[i].stop_game();
+    }    
+    //hideTO = {};
+    //showTO = {};
+    //TOindex = 0;
     
     $('#side-menu').animate({right: '0%'}, 500);
     
