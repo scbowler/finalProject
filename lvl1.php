@@ -1,6 +1,6 @@
 <section id="lvl1">
    
-    <div id="gr-container"><div class="get-ready" id="timer">5</div></div>
+    <div id="gr-container"><div class="get-ready" id="count-down"></div></div>
    
     <div id="score-board"><span id='underline'>Score</span><br><span id="total-score">0</span>
         <div class='cloud-part' id="c2p1"></div>
@@ -18,49 +18,52 @@
         <div class='cloud-part' id="c1p5"></div>
     </div>
 
-    <div class='gTimer'>0</div>
-
+    <div class='gTimer'>
+        <div id="time-bar"></div>
+        <div class="time-border"></div>
+    </div>
+    
     <div id="tower">
         <table>
            <tbody>
             <tr>
                 <th></th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
                 <th></th>
             </tr>
             <tr>
                 <th></th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
                 <th></th>
             </tr>
             <tr>
                 <th></th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
                 <th></th>
             </tr>
             <tr>
                 <th></th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
+                <td><div class='npc-container'></div></td>
                 <th></th>
             </tr>
             </tbody>

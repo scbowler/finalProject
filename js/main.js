@@ -1,34 +1,26 @@
-var showTO, hideTO, shuffle;
+var shuffle, NPCarray, NPCcount;
+var showTO = {};
+var hideTO = {};
 var totalScore = 0;
 var gameModes = ['Timed', 'Ammo', 'Survival'];
 var gameStatus = 'stopped';
+var totalShots = 0;
+var totalHits = 0;
+var finalScore = 0;
+var TOindex = 0;
 
 $(document).ready(function(){
-    populate(true);
-    clearTOs();
-    getReady(true);
     
-    addTrees(2, 10, 70, 20, '#lvl1');
-    addTrees(4, 15, 20, 20, '#mm-background'); 
-    addTrees(5, 5, 20, 10, '#mm-background');
+    var location = getLocation();
     
-    $('table').on('click', 'td div', function(){
-        var badGuy = $(this);
-        badGuy.stop().slideUp(150);
-        updateScore(badGuy);
-    });
-    
-    $('body').on('click', '.cloud1', function(){
-        populate(true);
-    });
-    
-    $('body').on('click', '#top', function(){
-        clearTOs();
-    });
-    
-    $('body').on('click', '#trunk', function(){
-        $('td div').animate({top: '12%'}, 300);
-    });
+    if(location == '' || location == 'mainMenu'){
+        addTrees(4, 15, 20, 20, '#mm-background'); 
+        addTrees(5, 5, 20, 10, '#mm-background'); 
+    }else if(location == 'lvl1'){
+        addTrees(2, 10, 70, 20, '#lvl1');
+        init();
+        getReady(3);
+    }
     
     $('#main-menu').on('click', '#new-game', function(){        
         window.location = '?page=lvl1.php';
@@ -54,84 +46,160 @@ $(document).ready(function(){
     });
 });
 
+function init(){
+    NPCarray = $('.npc-container');
+    NPCcount = NPCarray.length;
+}
+
 function startGame(){
+    console.log('startGame called');
+    totalScore = 0;
+    totalShots = 0;
+    totalHits = 0;
+    finalScore = 0;
     gameStatus = 'running';
+    $('#total-score').text(totalScore);
+    
     populate(true);
-    $('.gTimer').attr('id', 'timer');
     timer('start', 15);
-    setTimeout(gameOver, 15000);
+    
+    $('body').on('click', countClicks);
+    $('table').on('click', 'td div', hitNPC);
+}
+
+function countClicks(){
+    totalShots++
+}
+
+function hitNPC(){
+    var badGuy = $(this);
+    badGuy.stop().slideUp(150);
+    updateScore(badGuy);
+    totalHits++;
 }
 
 function gameOver(){
+    $('body').off('click', countClicks);
+    $('table').off('click', 'td div', hitNPC);
+    
     gameStatus = 'stopped';
     clearTOs();
-    var temp = $('<div>Game Over</div>');
+    updateSideMenu();
     
-    temp.css({zIndex: 5, fontSize: '4em'});
-    temp.appendTo('body');
+    hideTO = {};
+    showTO = {};
+    TOindex = 0;
+    
+    $('#side-menu').animate({right: '0%'}, 500);
+    
+    $('#side-menu').on('click', '#play-again', function(){
+        $('#side-menu').animate({right: '-30%'}, 500);
+        $("<div id='gr-container'><div class='get-ready' id='count-down'></div></div>").appendTo("#lvl1");
+        getReady(3);
+    });
+    
+    $('#side-menu').on('click', '#quit', function(){
+        window.location = '?page=mainMenu.php';
+    });
+}
+
+function clacAccuracy(){
+    if(totalShots === 0){
+        return totalShots;
+    }
+    return Math.round((totalHits/totalShots) * 100) / 100;
+}
+
+function calcBonus(accuracy){
+    return Math.floor((accuracy * 5) * 100) / 100;
+}
+
+function calcScore(bonus){
+    return Math.round(bonus * totalScore);
+}
+
+function updateSideMenu(){
+    var accuracy = clacAccuracy();
+    var bonus = calcBonus(accuracy);
+    finalScore = calcScore(bonus);
+    
+    $('#sm-score').text(totalScore);
+    $('#bonus').text(bonus);
+    $('#sm-totalScore').text(finalScore);
 }
 
 function populate(ready){
-    var windows = $('#tower table td');
-    
+    var npcContainer = $('.npc-container');
+    console.log("populate called with:", ready);
     if(!ready){
-        clearTOs(hideTO);
-        var people = $('td div');
+        clearTOs();
         console.log("Board Shuffled");
-        people.animate({top: '100%'}, 300);
         setTimeout(function(){populate(true);}, 400);
         return;
     }
+    else
+        console.log('ready');
     
-    windows.html('');
-    var length = windows.length;
-
-    for(var i=0; i<length; i++){
+    for(var i=0; i<NPCcount; i++){
         var ran = Math.floor((Math.random() * 99) + 1);
-        var inWindow = $('<div>');
+        var npc = $(npcContainer[i]);
 
         if(ran > 20 && ran < 30){
-            inWindow.addClass('woman');
+            npc.addClass('woman');
         }else if(ran > 30 && ran < 40){
-            inWindow.addClass('man');
+            npc.addClass('man');
         }else if(ran > 84 && ran < 91){
-            inWindow.addClass('super-ninja');
+            npc.addClass('super-ninja');
         }else{
-            inWindow.addClass('ninja');
-        }
-        inWindow.appendTo(windows[i]);
+            npc.addClass('ninja');
+        }        
     }
+    
+    //console.log("timeOut index in populate", TOindex);
     randomPopUp();
     var shuffleTime = Math.floor((Math.random() * 5000) + 5000);
+    clearTimeout(shuffle);
     shuffle = setTimeout(function(){populate(false)}, shuffleTime);
 }
 
 function randomPopUp(){
+    console.log("randomPopUp called")
     var hideTime = 500;
-    var people = $('td div');
-    var peopleCount = people.length;
-    var ranIndex = Math.floor(Math.random() * (peopleCount-1));
-    var person = $(people[ranIndex]);
-    
-    person.removeClass('fall');
+    var ranIndex = Math.floor(Math.random() * (NPCcount-1));
+    var person = $(NPCarray[ranIndex]);
+    console.log("Random Index: ", ranIndex);
+    person.show();
     person.animate({top: '12%'}, 300);
     
     if(person.hasClass('super-ninja')){
         hideTime = 150;
-        console.log("Super Ninja!");
+        //console.log("Super Ninja!");
     }else{
         hideTime = Math.floor((Math.random() * 400) + 800);
     }
+    var tempIndex = TOindex;
+    hideTO[TOindex] = setTimeout(function(){clearTimeout(hideTO[tempIndex]); delete hideTO[tempIndex]; person.animate({top: '100%'});}, hideTime);
     
-    hideTO = setTimeout(function(){person.animate({top: '100%'}, 300);}, hideTime);
-    
-    var showTime = Math.floor((Math.random() * 1000) + 500);
-    showTO = setTimeout(function(){randomPopUp();}, showTime);
+    var showTime = Math.floor((Math.random() * 800) + 400);
+    showTO[TOindex] = setTimeout(function(){clearTimeout(showTO[tempIndex]); delete showTO[tempIndex]; randomPopUp(); }, showTime);
+    //console.log("Hide array:", hideTO, "Show array:", showTO);
+    TOindex++;
 }
 
 function clearTOs(extra){
-    clearTimeout(showTO);
+    console.log("Clear TOs called");
+    for(keys in showTO){
+        clearTimeout(showTO[keys]);
+        delete showTO[keys];
+    }
+    for(keys in hideTO){
+        clearTimeout(hideTO[keys]);
+        delete hideTO[keys];
+    }
+    
     clearTimeout(shuffle);
+    $('td div').animate({top: '100%'}, 300);
+    
     if(extra != undefined){
         clearTimeout(extra);
     }
@@ -163,19 +231,15 @@ function addTrees(amount, loc, seperation, verticle, append){
     if(verticle === undefined){
         verticle = 20;
     }
-    
     var vertPercent = verticle + '%';
     
     buildTree(id).css({left: locPercent, bottom: vertPercent}).appendTo(append);
-    
-    
     
     addTrees(amount-1, loc+seperation, seperation, verticle, append);
 }
 
 function buildTree(id){
     var mainCSS = {height: '30%', left: '0%', position: 'absolute', width: '10%', zIndex: '3'};
-    
     var topHeight = Math.floor((Math.random() * 20) + 40) + "%";
     var topWidth = Math.floor((Math.random() * 20) + 40);
     var topLeft = ((100 - topWidth)/2) + "%";
@@ -216,9 +280,9 @@ function timer(status, howLong, timeOut, start){
         if(timeOut != undefined){
             clearTimeout(timeOut);
         }
+        gameOver();
         return;
     }
-    
     var now = (new Date().getTime()) / 1000 | 0;
     var elapsed = now - start;
     
@@ -227,23 +291,43 @@ function timer(status, howLong, timeOut, start){
     }else{
         status = 'running';
     }
-    
     var t = setTimeout(function(){timer(status, howLong, t, start);}, 1000);
+    var percent = Math.round((elapsed / howLong) * 100) + 3 + "%";
     
-    $('#timer').text(howLong-elapsed);
+    $('#time-bar').animate({top: percent}, 990);
 } 
 
-function getReady(init){
-    if(init){
-        timer('start', 5);
-    }
+function getReady(start){
+    $('#count-down').text(start);
+    
     var counter = $('.get-ready');
     counter.addClass('number-animate');
     
-    if(counter.text() > 0){
-        setTimeout(function(){getReady(false);}, 1000);
+    if(start > 0){
+        var grTO = setTimeout(function(){checkTimeout(grTO);getReady(start-1);  }, 1000);
     }else{
         counter.text('GO!');
-        setTimeout(function(){$('#gr-container').remove(); startGame();}, 1000);
+        var startTO = setTimeout(function(){checkTimeout(startTO);$('#gr-container').remove(); startGame();  }, 1000);
     }
+}
+
+function getLocation(){
+    var location = window.location.search;
+    if(location == ''){
+        return '';
+    }
+    
+    location = location.split('=');
+    location = location[1];
+    location = location.split('.');
+    location = location[0];
+    
+    return location;
+}
+
+function checkTimeout(to){
+    if(to == undefined){
+        return;
+    }
+    clearTimeout(to);
 }
