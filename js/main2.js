@@ -22,7 +22,10 @@ function npc(target_element, npc_index) {
     this.heartbeat = null;
     this.index = npc_index;
     this.hide_timeout = null;
-    this.hideTime = 1500;
+    this.hideTime = 1500; 
+    this.showTime = 750;
+    this.log=[];
+    this.show_log = true;
     this.superninja_hidetime = 1000;
     this.actor = null; //the image class, ie woman, ninja, man, etc
     this.element = target_element; //the element that will display this npc
@@ -38,7 +41,10 @@ function npc(target_element, npc_index) {
     }
     this.start_game = function(){
         this.stop_heartbeat();
-        this.heartbeat = setInterval(this.popup_check,1000);
+        var _this=this;
+        this.heartbeat = setInterval(function(){
+            _this.popup_check();
+        },1000);
     }
     this.stop_game = function(){
         this.stop_heartbeat();
@@ -49,34 +55,56 @@ function npc(target_element, npc_index) {
             this.heartbeat = null;
         }  
     }
+    this.toggle_log = function(){
+        this.show_log = !this.show_log;
+    }
+    this.log_action = function(message){
+        if(this.show_log){
+            console.log(message);
+        }
+        this.log.push(message);
+    }
+    this.show_log = function(){
+        console.log('mooooo');
+        //console.log(this.index+' message log for ',this.log); 
+    }
+    this.clear_log = function(){
+        this.message = [];
+    }
     this.popup_check = function(){
-if(total_npcs_up>popup_scale_min_npc_num){
+            this.log_action(this.index+': popup checking: '+total_npcs_up+'<'+popup_scale_min_npc_num);
+if(total_npcs_up<popup_scale_min_npc_num){
+            
             var percent_popup = (maximum_npcs_up - popup_scale_min_npc_num) * popup_chance_delta_per_npc;
+            this.log_action(this.index+': percent_popup: '+percent_popup);
+            var rand = Math.random();
+            this.log_action(this.index+': rand: '+rand);
             if(Math.random()<=percent_popup){
+                this.log_action(this.index+': initiating popup');
                 this.popup();
             }
         }
     }
     this.popup = function(){
-        console.log(this.index+': starting popup');
-        console.log("element: ",this.element);
+        this.log_action(this.index+': starting popup');
+        this.log_action("element: ",this.element);
         total_npcs_up++;
-        this.element.animate({top: '0%'}, 100);
+        this.element.animate({top: '0%'}, this.showTime);
         if(this.avatar=='super-ninja'){
             var hide_ms = this.superninja_hidetime;
         }
         else {
             var hide_ms = this.hideTime;
         }
-        console.log(this.index+': hiding in '+hide_ms+'ms');
+        this.log_action(this.index+': hiding in '+hide_ms+'ms');
         var _this = this;
         this.hide_timeout = setTimeout(function(){
             _this.popdown();
         },hide_ms);
-        console.log(this.index+': ending popup');
+        this.log_action(this.index+': ending popup');
     }
     this.popdown = function(){
-        console.log(this.index+': popping down');
+        this.log_action(this.index+': popping down');
         total_npcs_up--;
         this.element.animate({top: '100%'}, this.hideTime);
     }
