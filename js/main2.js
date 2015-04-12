@@ -11,7 +11,7 @@ var totalHits = 0;
 var finalScore = 0;
 var TOindex = 0;
 var total_npcs_up = 0;
-var base_popup_chance_per_second = .2;
+var base_popup_chance_per_second = .5;
 var maximum_npcs_up = 10;
 var popup_scale_min_npc_num = 5;
 var popup_chance_delta_per_npc = base_popup_chance_per_second/(maximum_npcs_up-popup_scale_min_npc_num);
@@ -27,10 +27,12 @@ function npc(target_element, npc_index) {
     this.hide_timeout = null;
     this.hideTime = 1500; 
     this.showTime = 750;
+    this.dead_hideTime= 100;
     this.log=[];
     this.keep_log = false;
     this.display_log = false;
     this.change_after_popdown = true;
+    this.randomize_timer = true;
     this.superninja_hidetime = 1000;
     this.actor = null; //the image class, ie woman, ninja, man, etc
     this.element = target_element; //the element that will display this npc
@@ -44,15 +46,22 @@ function npc(target_element, npc_index) {
     this.get_element = function(){
         console.log("this element: ",this.element);
     }
+    this.calculate_heartbeat = function(){
+        var x = (Math.random() * max_heartbeat_adjusted + min_heartbeat)*1000;
+        return x;
+    }
     this.start_game = function(){
+        this.change_heartbeat();
+    }
+    this.change_heartbeat = function(){
         this.stop_heartbeat();
         var _this=this;
-        var this_heartbeat_time = (Math.floor(Math.random() * this.max_heartbeat_adjusted) + this.min_heartbeat)*1000;
         this.heartbeat = setInterval(function(){
             _this.popup_check();
-        },this_heartbeat_time);
+        },this.calculate_heartbeat());
     }
     this.stop_game = function(){
+        this.disable_hits();
         this.stop_heartbeat();
     }
     this.stop_heartbeat = function(){
@@ -73,13 +82,15 @@ function npc(target_element, npc_index) {
         }
     }
     this.show_log = function(){
-        console.log('mooooo');
-        //console.log(this.index+' message log for ',this.log); 
+        console.log(this.index+' message log for ',this.log); 
     }
     this.clear_log = function(){
         this.message = [];
     }
     this.popup_check = function(){
+        if(this.randomize_timer){
+            this.change_heartbeat();
+        }
         if(total_npcs_up<popup_scale_min_npc_num){
             
             var percent_popup = (maximum_npcs_up - popup_scale_min_npc_num) * popup_chance_delta_per_npc;
@@ -93,6 +104,7 @@ function npc(target_element, npc_index) {
         }
     }
     this.popup = function(){
+        this.enable_hits();
         this.log_action(this.index+': starting popup');
         this.log_action("element: ",this.element);
         total_npcs_up++;
@@ -110,10 +122,21 @@ function npc(target_element, npc_index) {
         },hide_ms);
         this.log_action(this.index+': ending popup');
     }
-    this.popdown = function(){
+    this.popdown = function(dying){
+        if(typeof dying == 'undefined' || !dying){
+            var hideTime = this.hideTime;
+        }
+        else{
+            var hideTime = this.dead_hideTime;
+        }
         this.log_action(this.index+': popping down');
+        
         total_npcs_up--;
-        this.element.animate({top: '100%'}, this.hideTime, this.change_check);
+        this.element.stop().animate({top: '100%'}, hideTime, this.change_check);
+    }
+    this.die = function(){
+        this.disable_hits();
+        this.popdown(true);
     }
     this.change_check = function(){
         if(this.change_after_pop){
@@ -123,15 +146,19 @@ function npc(target_element, npc_index) {
     }
     this.was_hit = function(){
         //function hitNPC()
-        this.element.stop().slideUp(150);
+        this.log_action(this.index+': was hit');
+        this.die();
         updateScore(this.element);
         totalHits++;
     }
     this.enable_hits = function(){
-        $(this.element).on('click', this.was_hit);
+        var _this = this;
+        $(this.element).on('click', function(){
+            _this.was_hit();
+        });
     }
     this.disable_hits = function(){
-        $(this.element).on('click', this.was_hit);
+        $(this.element).off('click', this.was_hit);
     }
     this.select_random_actor = function(){
         var ran = Math.floor((Math.random() * 99) + 1);
@@ -147,6 +174,9 @@ function npc(target_element, npc_index) {
     }
     this.init();
 }
+npc.prototype.keep_log = false;
+npc.prototype.display_log = false;
+
 $(document).ready(function(){
 
     npcContainer = $('.npc-container');
