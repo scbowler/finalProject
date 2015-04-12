@@ -11,7 +11,7 @@ var totalHits = 0;
 var finalScore = 0;
 var TOindex = 0;
 var total_npcs_up = 0;
-var base_popup_chance_per_second = .5;
+var base_popup_chance_per_second = .2;
 var maximum_npcs_up = 10;
 var popup_scale_min_npc_num = 5;
 var popup_chance_delta_per_npc = base_popup_chance_per_second/(maximum_npcs_up-popup_scale_min_npc_num);
@@ -19,6 +19,8 @@ var npcContainer=null;
 var min_heartbeat = 1;
 var max_heartbeat = 5;
 var max_heartbeat_adjusted = (max_heartbeat + 1) - min_heartbeat;
+var quickpop_time = 1;
+var elapsed = null;
 
 
 function npc(target_element, npc_index) {
@@ -47,8 +49,15 @@ function npc(target_element, npc_index) {
         console.log("this element: ",this.element);
     }
     this.calculate_heartbeat = function(){
-        var x = (Math.random() * max_heartbeat_adjusted + min_heartbeat)*1000;
-        return x;
+        if(elapsed < quickpop_time)
+        { 
+            return 100;
+        }
+        else
+        {
+            var x = (Math.random() * max_heartbeat_adjusted + min_heartbeat)*1000;
+            return x;
+        }
     }
     this.start_game = function(){
         this.change_heartbeat();
@@ -132,15 +141,21 @@ function npc(target_element, npc_index) {
         this.log_action(this.index+': popping down');
         
         total_npcs_up--;
-        this.element.stop().animate({top: '100%'}, hideTime, this.change_check);
+        var _this = this;
+        this.element.stop().animate({top: '100%'}, hideTime, function(){
+            _this.change_check();
+        });
     }
     this.die = function(){
         this.disable_hits();
         this.popdown(true);
     }
     this.change_check = function(){
-        if(this.change_after_pop){
+        console.log('change after popdown '+this.change_after_popdown);
+        if(this.change_after_popdown){
+            console.log('was: '+this.actor);
             this.select_random_actor();
+            console.log('now: '+this.actor);
             this.set_image();
         }
     }
@@ -468,7 +483,7 @@ function timer(status, howLong, timeOut, start){
         return;
     }
     var now = (new Date().getTime()) / 1000 | 0;
-    var elapsed = now - start;
+    elapsed = now - start;
     
     if(howLong <= elapsed){
         status = 'stop';
