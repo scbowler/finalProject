@@ -19,6 +19,7 @@ var npcContainer=null;
 var min_heartbeat = 1;
 var max_heartbeat = 5;
 var max_heartbeat_adjusted = (max_heartbeat + 1) - min_heartbeat;
+
 var quickpop_time = 1;
 var elapsed = null;
 
@@ -70,7 +71,7 @@ function npc(target_element, npc_index) {
         },this.calculate_heartbeat());
     }
     this.stop_game = function(){
-        this.disable_hits();
+        this.die();
         this.stop_heartbeat();
     }
     this.stop_heartbeat = function(){
@@ -151,11 +152,8 @@ function npc(target_element, npc_index) {
         this.popdown(true);
     }
     this.change_check = function(){
-        console.log('change after popdown '+this.change_after_popdown);
         if(this.change_after_popdown){
-            console.log('was: '+this.actor);
             this.select_random_actor();
-            console.log('now: '+this.actor);
             this.set_image();
         }
     }
