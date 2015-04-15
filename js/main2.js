@@ -196,7 +196,8 @@ function custom_timer(seconds){
     this.timer_delagates = {};
     this.timer = null;
     this.last_whole_second = null;
-    this.timer_delegates = {};
+    this.timer_finish_delegates = {};
+    this.timer_second_delegates = {};
     this.start = function(){
         console.log('starting');
         this.init();
@@ -241,20 +242,30 @@ function custom_timer(seconds){
             this.last_whole_second = whole_now;
             var elapsed = Math.floor(now - this.started_at);
             console.log(elapsed + "seconds elapsed");
+            for(index in this.timer_second_delegates){
+                console.log('calling '+this.timer_second_delegates[index]['name']);
+                window[this.timer_second_delegates[index]['name']].call(this, elapsed);
+            }
         }
     }
     this.end_timer = function(){
         this.clear_timer();
-        for(index in this.timer_delegates){
-            console.log('calling '+this.timer_delegates[index]['name']);
-            window[this.timer_delegates[index]['name']].apply();
+        for(index in this.timer_finish_delegates){
+            console.log('calling '+this.timer_finish_delegates[index]['name']);
+            window[this.timer_finish_delegates[index]['name']].apply();
         }
     }
-    this.register_handler = function(function_name){
-        this.timer_delegates[function_name]={name:function_name, set: true};
+    this.register_finish_handler = function(function_name){
+        this.timer_finish_delegates[function_name]={name:function_name, set: true};
     }
-    this.remove_handler = function(function_name){
-        delete this.timer_delegates[function_name];
+    this.remove_finish_handler = function(function_name){
+        delete this.timer_finish_delegates[function_name];
+    }
+    this.register_second_handler = function(function_name){
+        this.timer_second_delegates[function_name]={name:function_name, set: true};
+    }
+    this.remove_second_handler = function(function_name){
+        delete this.timer_second_delegates[function_name];
     }
                                 
     
@@ -262,10 +273,14 @@ function custom_timer(seconds){
     function this_test(){
         console.log('test called');
     }
+    function this_second_test(seconds){
+        console.log('second test called at ',seconds);
+    }
 $(document).ready(function(){
 
     moo = new custom_timer(2);
-    moo.register_handler('this_test');
+    moo.register_finish_handler('this_test');
+    moo.register_second_handler('this_second_test');
     moo.init();
     npcContainer = $('.npc-container');
     var location = getLocation();
@@ -570,6 +585,19 @@ function timer(status, howLong, timeOut, start){
 } 
 
 function getReady(start){
+    $('#count-down').text(start);
+    
+    var counter = $('.get-ready');
+    counter.addClass('number-animate');
+    
+    if(start > 0){
+        var grTO = setTimeout(function(){checkTimeout(grTO);getReady(start-1);  }, 1000);
+    }else{
+        counter.text('GO!');
+        var startTO = setTimeout(function(){checkTimeout(startTO);$('#gr-container').remove(); startGame();  }, 1000);
+    }
+}
+function getReady_old(start){
     $('#count-down').text(start);
     
     var counter = $('.get-ready');
