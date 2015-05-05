@@ -11,7 +11,7 @@ if(!isset($_SESSION['allowed'])){
         <title>The Tower</title>
         <link rel="stylesheet" href="stylesheets/main.css">
         <script src="js/jquery-2.1.3.min.js"></script>
-        <script src="js/main2.js"></script>
+        <script src="js/main.js"></script>
     </head>
     <body>
         

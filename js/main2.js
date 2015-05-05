@@ -29,7 +29,7 @@ function npc(target_element, npc_index) {
     this.index = npc_index;
     this.hide_timeout = null;
     this.hideTime = 1500; 
-    this.showTime = 750;
+    this.showTime = 350;
     this.dead_hideTime= 100;
     this.log=[];
     this.keep_log = false;
@@ -163,6 +163,7 @@ function npc(target_element, npc_index) {
         this.die();
         updateScore(this.element);
         totalHits++;
+        console.log(totalHits);
     }
     this.enable_hits = function(){
         var _this = this;
@@ -262,6 +263,7 @@ function startGame(){
 
 function countClicks(){
     totalShots++
+    console.log("Shot Counter:", totalShots);
 }
 
 function hitNPC(){

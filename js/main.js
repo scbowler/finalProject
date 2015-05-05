@@ -14,8 +14,8 @@ $(document).ready(function(){
     var location = getLocation();
     
     if(location == '' || location == 'mainMenu'){
-        addTrees(4, 15, 20, 20, '#mm-background'); 
-        addTrees(5, 5, 20, 10, '#mm-background'); 
+        addTrees(4, 15, 20, [2, 35], '#mm-background'); 
+        addTrees(5, 5, 20, [2, 35], '#mm-background'); 
     }else if(location == 'lvl1'){
         addTrees(2, 10, 70, 20, '#lvl1');
         init();
@@ -93,9 +93,10 @@ function gameOver(){
     $('#side-menu').animate({right: '0%'}, 500);
     
     $('#side-menu').on('click', '#play-again', function(){
-        $('#side-menu').animate({right: '-30%'}, 500);
-        $("<div id='gr-container'><div class='get-ready' id='count-down'></div></div>").appendTo("#lvl1");
-        getReady(3);
+        location.reload();
+        //$('#side-menu').animate({right: '-30%'}, 500);
+        //$("<div id='gr-container'><div class='get-ready' id='count-down'></div></div>").appendTo("#lvl1");
+        //getReady(3);
     });
     
     $('#side-menu').on('click', '#quit', function(){
@@ -130,19 +131,27 @@ function updateSideMenu(){
 
 function populate(ready){
     var npcContainer = $('.npc-container');
-    console.log("populate called with:", ready);
+    //console.log("populate called with:", ready);
     if(!ready){
         clearTOs();
-        console.log("Board Shuffled");
+        //console.log("Board Shuffled");
         setTimeout(function(){populate(true);}, 400);
         return;
     }
-    else
-        console.log('ready');
     
     for(var i=0; i<NPCcount; i++){
         var ran = Math.floor((Math.random() * 99) + 1);
         var npc = $(npcContainer[i]);
+
+        if(npc.hasClass('woman')){
+            npc.removeClass('woman');
+        }else if(npc.hasClass('man')){
+            npc.removeClass('man');
+        }else if(npc.hasClass('super-ninja')){
+            npc.removeClass('super-ninja');
+        }else if(npc.hasClass('ninja')){
+            npc.removeClass('ninja');
+        }
 
         if(ran > 20 && ran < 30){
             npc.addClass('woman');
@@ -172,7 +181,7 @@ function randomPopUp(){
     person.animate({top: '12%'}, 300);
     
     if(person.hasClass('super-ninja')){
-        hideTime = 150;
+        hideTime = 250;
         //console.log("Super Ninja!");
     }else{
         hideTime = Math.floor((Math.random() * 400) + 800);
@@ -206,18 +215,28 @@ function clearTOs(extra){
 }
 
 function updateScore(person){
+    
+    var parent = person.parent();
+
+    setTimeout(function(){parent.css({"backgroundColor": "#3399ff"});}, 200);
+    setTimeout(function(){person.css({"display": "inline-block", "top": "100%"});}, 600);
+
     if(person.hasClass('ninja')){
         //console.log("You clicked a ninja");
         totalScore += 2;
+        parent.css({"backgroundColor": "green"});
     }else if(person.hasClass('super-ninja')){
         //console.log("You clicked a super ninja");
         totalScore += 4;
+        parent.css({"backgroundColor": "lightgreen"});
     }else{
         //console.log("You clicked a person");
-        if(totalScore > 2){
+        parent.css({"backgroundColor": "red"});
+        if(totalScore >= 2){
             totalScore -= 2;
         }
     }
+
     $('#total-score').text(totalScore);
 }
 
@@ -225,13 +244,23 @@ function addTrees(amount, loc, seperation, verticle, append){
     if(amount < 1){
         return;
     }
+
     var locPercent = loc + '%';
     var id = 'tree' + loc;
     
     if(verticle === undefined){
         verticle = 20;
+    }else if(typeof verticle == "object"){
+        var vert = verticle
+        verticle = Math.floor((Math.random() * (vert[1] - vert[0])) + vert[0]);
+        //console.log("Random Verticle", verticle);
     }
+
     var vertPercent = verticle + '%';
+
+    if(vert !== undefined){
+        verticle = vert;
+    }
     
     buildTree(id).css({left: locPercent, bottom: vertPercent}).appendTo(append);
     

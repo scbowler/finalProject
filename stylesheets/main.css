@@ -337,9 +337,13 @@ div {
     ==========================
 */
 
+#high-scores, #game-mode, #next-level {
+    display: none;
+}
+
 #main-menu {
     background-color: rgba(0, 0, 0, 0.6);
-    border-radius: 20%;
+    border-radius: 30px;
     position: absolute;
     width: 30%;
     font-size: 2em;
@@ -353,7 +357,7 @@ div {
     background-color: rgba(255, 255, 255, 0.9);
     box-shadow: -3px 2px 6px 0px white, -3px 3px 0px 2px black;
     width: 75%;
-    border-radius: 25%;
+    border-radius: 20px;
     text-align: center;
     margin: 6% 0;
     padding: 2% 4%;
@@ -429,9 +433,9 @@ div {
 
 .sm-btn {
     font-size: .5em;
-    margin: 2% 0;
+    margin: 8% 0;
 }
 
 #play-again {
-    margin-top: 10%;
+    margin-top: 18%;
 }
