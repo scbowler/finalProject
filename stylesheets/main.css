@@ -337,7 +337,7 @@ div {
     ==========================
 */
 
-#high-scores, #game-mode, #next-level {
+#game-mode, #next-level {
     display: none;
 }
 
@@ -438,4 +438,38 @@ div {
 
 #play-again {
     margin-top: 18%;
+}
+
+#name-container {
+    z-index: 100;
+    position: absolute;
+    top: 20%;
+    left: 32%;
+    background-color: rgba(0, 0, 0, 0.95);
+    text-align: center;
+    color: white;
+    padding: 0 3%;
+    padding-bottom: 3%;
+}
+
+#name-container input {
+    margin: 5% 0;
+    font-size: 20px;
+    padding: 4px;
+}
+
+#scoreTable {
+    position: absolute;
+    left: 31%;
+    text-align: center;
+    background-color: rgba(0,0,0,.90);
+    color: white;
+    font-size: 28px;
+    border-spacing: 10px;
+    top: 10%;
+    z-index: 15;
+}
+
+#scoreTable td {
+    border-bottom: 1px gray solid;
 }

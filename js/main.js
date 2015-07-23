@@ -2,12 +2,16 @@ var shuffle, NPCarray, NPCcount;
 var showTO = {};
 var hideTO = {};
 var totalScore = 0;
+var dbHighScores = null;
 var gameModes = ['Timed', 'Ammo', 'Survival'];
+var currentGameMode = "Timed";
+var currentLevel = null;
 var gameStatus = 'stopped';
 var totalShots = 0;
 var totalHits = 0;
 var finalScore = 0;
 var TOindex = 0;
+//var clickBonus = 1;
 
 $(document).ready(function(){
     
@@ -18,12 +22,25 @@ $(document).ready(function(){
         addTrees(5, 5, 20, [2, 35], '#mm-background'); 
     }else if(location == 'lvl1'){
         addTrees(2, 10, 70, 20, '#lvl1');
+        currentLevel = location;
+        setSessions();
         init();
         getReady(3);
     }
     
     $('#main-menu').on('click', '#new-game', function(){        
         window.location = '?page=lvl1.php';
+    });
+
+    $('#main-menu').on('click', '#high-scores', function(){        
+        
+        var menu = $("#main-menu");
+        menu.fadeOut();
+        addScoreToDb(null);
+        
+        $("body").on("click", "#scoreTable", function(){
+            setTimeout(function(){menu.fadeIn();}, 200);
+        });
     });
     
     $('#main-menu').on('click', '#game-mode', function(){
@@ -42,7 +59,8 @@ $(document).ready(function(){
                     index = 0;
                     break;
         }
-        modeBtn.text(gameModes[index]);
+        currentGameMode = gameModes[index];
+        modeBtn.text(currentGameMode);
     });
 });
 
@@ -52,7 +70,8 @@ function init(){
 }
 
 function startGame(){
-    console.log('startGame called');
+    //console.log('startGame called');
+    //clickBonus = 1;
     totalScore = 0;
     totalShots = 0;
     totalHits = 0;
@@ -68,7 +87,8 @@ function startGame(){
 }
 
 function countClicks(){
-    totalShots++
+    totalShots++;
+    //console.log("body click");
 }
 
 function hitNPC(){
@@ -76,6 +96,7 @@ function hitNPC(){
     badGuy.stop().slideUp(150);
     updateScore(badGuy);
     totalHits++;
+    //console.log("Hit NPC");
 }
 
 function gameOver(){
@@ -85,12 +106,14 @@ function gameOver(){
     gameStatus = 'stopped';
     clearTOs();
     updateSideMenu();
+    checkHighScores();
     
     hideTO = {};
     showTO = {};
     TOindex = 0;
     
     $('#side-menu').animate({right: '0%'}, 500);
+    $('#main-area').animate({opacity: '.3'}, 400);
     
     $('#side-menu').on('click', '#play-again', function(){
         location.reload();
@@ -101,6 +124,83 @@ function gameOver(){
     
     $('#side-menu').on('click', '#quit', function(){
         window.location = '?page=mainMenu.php';
+    });
+}
+
+function checkHighScores(){
+    var length = dbHighScores.length;
+    var highScore = false;
+    //var rank = 0;
+
+    while(length && !highScore){
+        length--;
+        if(finalScore > dbHighScores[length]){
+            highScore = true;
+        } 
+    }
+    //console.log("high score", highScore);
+    //console.log(dbHighScores);
+    
+    if(highScore){
+        getUserName();
+    }else{
+        addScoreToDb(null);
+    }    
+}
+
+function getUserName(){
+    var nameContainer = $("<div id='name-container'></div>").html("<h1>You Acheived a High Score!</h1>");
+    var input = $("<input type='text' id='name' name='name' placeholder='Enter Your Name'>");
+    var button = $("<div class='btn' id='submit-name'><div class='menu-text'>OK</div></div>");
+    var userName = '';
+
+    input.appendTo(nameContainer);
+    button.appendTo(nameContainer);
+
+    $("body").append(nameContainer);
+
+    button.click(function(){
+        userName = input.val();
+        nameContainer.remove();
+        console.log("Name entered", userName);
+        addScoreToDb(userName);
+    });
+}
+
+function addScoreToDb(name){
+    sendData = {score: finalScore, name: name};
+
+    $.ajax({
+        url: 'actions/addHighScore.php',
+        method: 'POST',
+        data: sendData,
+        dataType: 'json', 
+        cache: false,
+        success: function(data){
+            console.log("addScoreToDb returned data", data);
+            makeScoreTable(data['scoreData']['html']);
+        }
+    });
+}
+
+function makeScoreTable(tableRows){
+    
+    var table = $("<table id='scoreTable'></table>");
+    var tbody = $("<tbody></tbody>");
+    var tableData = "<tr><th>Rank</th><th>Name</th><th>Score</th><th>Level</th><th>Game Mode</th></tr>";
+    var length = 10; //tableRows.length;
+
+    for(var i=0; i<length; i++){
+        tableData += tableRows[i];
+    }
+
+    tbody.html(tableData).appendTo(table);
+    
+    var body = $("body");
+    table.appendTo(body).hide().fadeIn();
+    body.on("click", table, function(){
+        table.fadeOut();
+        setTimeout(function(){table.remove();}, 400);
     });
 }
 
@@ -172,11 +272,11 @@ function populate(ready){
 }
 
 function randomPopUp(){
-    console.log("randomPopUp called")
+    //console.log("randomPopUp called")
     var hideTime = 500;
     var ranIndex = Math.floor(Math.random() * (NPCcount-1));
     var person = $(NPCarray[ranIndex]);
-    console.log("Random Index: ", ranIndex);
+    //console.log("Random Index: ", ranIndex);
     person.show();
     person.animate({top: '12%'}, 300);
     
@@ -189,19 +289,19 @@ function randomPopUp(){
     var tempIndex = TOindex;
     hideTO[TOindex] = setTimeout(function(){clearTimeout(hideTO[tempIndex]); delete hideTO[tempIndex]; person.animate({top: '100%'});}, hideTime);
     
-    var showTime = Math.floor((Math.random() * 800) + 400);
+    var showTime = Math.floor((Math.random() * 600) + 200);
     showTO[TOindex] = setTimeout(function(){clearTimeout(showTO[tempIndex]); delete showTO[tempIndex]; randomPopUp(); }, showTime);
     //console.log("Hide array:", hideTO, "Show array:", showTO);
     TOindex++;
 }
 
 function clearTOs(extra){
-    console.log("Clear TOs called");
-    for(keys in showTO){
+    //console.log("Clear TOs called");
+    for(var keys in showTO){
         clearTimeout(showTO[keys]);
         delete showTO[keys];
     }
-    for(keys in hideTO){
+    for(var keys in hideTO){
         clearTimeout(hideTO[keys]);
         delete hideTO[keys];
     }
@@ -218,7 +318,7 @@ function updateScore(person){
     
     var parent = person.parent();
 
-    setTimeout(function(){parent.css({"backgroundColor": "#3399ff"});}, 200);
+    setTimeout(function(){parent.css({"backgroundColor": "#3399ff"});}, 250);
     setTimeout(function(){person.css({"display": "inline-block", "top": "100%"});}, 600);
 
     if(person.hasClass('ninja')){
@@ -228,10 +328,10 @@ function updateScore(person){
     }else if(person.hasClass('super-ninja')){
         //console.log("You clicked a super ninja");
         totalScore += 4;
-        parent.css({"backgroundColor": "lightgreen"});
+        person.css({"backgroundColor": "lightgreen"});
     }else{
         //console.log("You clicked a person");
-        parent.css({"backgroundColor": "red"});
+        person.css({"backgroundColor": "red"});
         if(totalScore >= 2){
             totalScore -= 2;
         }
@@ -335,6 +435,7 @@ function getReady(start){
     if(start > 0){
         var grTO = setTimeout(function(){checkTimeout(grTO);getReady(start-1);  }, 1000);
     }else{
+
         counter.text('GO!');
         var startTO = setTimeout(function(){checkTimeout(startTO);$('#gr-container').remove(); startGame();  }, 1000);
     }
@@ -359,4 +460,22 @@ function checkTimeout(to){
         return;
     }
     clearTimeout(to);
+}
+
+function setSessions(){
+    var sendData = {level: currentLevel, gMode: currentGameMode};
+    console.log("Session Data", sendData);
+
+    $.ajax({
+        url: 'actions/gameStart.php',
+        method: 'POST',
+        data: sendData,
+        dataType: 'json', 
+        cache: false,
+        success: function(data){
+            //console.log("setSessions returned data", data);
+            dbHighScores = data.highScores;
+            //console.log(dbHighScores);
+        }
+    });
 }

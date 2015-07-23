@@ -4,7 +4,7 @@ require_once('connect.php');
 
 $output['success'] = false;
 
-if(isset($_POST['level'] && isset($_POST['gMode']))){
+if(isset($_POST['score'])  isset($_SESSION['level']) && isset($_SESSION['gMode'])){
     $level = $_SESSION['level'];
     $gMode = $_SESSION['gMode'];
     
